@@ -1,5 +1,6 @@
 var FieldType = require('../Type');
 var util = require('util');
+var assign = require('object-assign');
 var utils = require('keystone-utils');
 
 var debug = require('debug')('keystone:fields:file');
@@ -20,6 +21,29 @@ function file (list, path, options) {
 }
 file.properName = 'File';
 util.inherits(file, FieldType);
+
+file.prototype.getData = function (item) {
+	var file = item.get(this.path);
+	var doc = item;
+	while (doc.parent) {
+		doc = doc.parent();
+		if (!doc) {
+			return file;
+		}
+	}
+	var listId = encodeURIComponent(this.list.key);
+	var docId = encodeURIComponent(doc._id);
+	var fileId = encodeURIComponent(item._id || file.filename);
+	if (fileId === docId) {
+		fileId = encodeURIComponent(file.filename);
+	}
+	var name = encodeURIComponent(file.originalname || file.filename);
+	return assign(
+		{},
+		file,
+		{ url: '/files/' + listId + '/' + docId + '/' + fileId + '/' + name }
+	);
+};
 
 /**
  * Registers the field on the List's Mongoose Schema.

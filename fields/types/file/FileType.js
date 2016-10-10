@@ -33,7 +33,7 @@ file.prototype.getData = function (item) {
 	}
 	var listId = encodeURIComponent(this.list.key);
 	var docId = encodeURIComponent(doc._id);
-	var fileId = encodeURIComponent(item._id || file.filename);
+	var fileId = encodeURIComponent(file._id || file.filename);
 	if (fileId === docId) {
 		fileId = encodeURIComponent(file.filename);
 	}

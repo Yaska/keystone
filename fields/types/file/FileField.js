@@ -17,7 +17,7 @@ import HiddenFileInput from '../../components/HiddenFileInput';
 import ImageThumbnail from '../../components/ImageThumbnail';
 
 const FileThumb = ({ url }) => {
-	const isPicture = url && url.match(/\.(jpeg|jpg|gif|png)$/i) != null;
+	const isPicture = url && url.match(/\.(jpeg|jpg|gif|png|svg)$/i) != null;
 	if (!isPicture) {
 		// TODO generic icons
 		return false;

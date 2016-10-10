@@ -23,9 +23,17 @@ const FileThumb = ({ url }) => {
 		return false;
 	}
 	return (
-		<div style={{ width: 150, marginRight: 10, flexShrink: 0 }}>
-			<img style={{ width: '100%', height: '100%' }} src={url}/>
-		</div>
+		<div
+			style={{
+				width: 150,
+				marginRight: 10,
+				flexShrink: 0,
+				backgroundImage: `url(${url})`,
+				backgroundPosition: 'center center',
+				backgroundSize: 'contain',
+				backgroundRepeat: 'no-repeat',
+			}}
+		/>
 	);
 };
 

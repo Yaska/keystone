@@ -24,6 +24,9 @@ util.inherits(file, FieldType);
 
 file.prototype.getData = function (item) {
 	var file = item.get(this.path);
+	if (!file) {
+		return file;
+	}
 	var doc = item;
 	while (doc.parent) {
 		doc = doc.parent();

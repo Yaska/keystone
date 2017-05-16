@@ -125,8 +125,8 @@ relationship.prototype.updateItem = function(item, data) {
 		throw new Error('fieldTypes.relationship.updateItem() Error - You cannot update populated relationships.');
 	}
 	if (this.many) {
-		var arr = item.get(this.path);
-		var _old = arr.map(function(i) { return String(i); });
+		var arr = item.get(this.path) || [];
+		var _old = arr.map(String);
 		var _new = data[this.path];
 		if (!utils.isArray(_new)) {
 			_new = String(_new || '').split(',');

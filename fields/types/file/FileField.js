@@ -16,6 +16,48 @@ import FileChangeMessage from '../../components/FileChangeMessage';
 import HiddenFileInput from '../../components/HiddenFileInput';
 import ImageThumbnail from '../../components/ImageThumbnail';
 
+const FileThumb = ({ url }) => {
+	const isPicture = url && url.match(/\.(jpeg|jpg|gif|png)$/i) != null;
+	if (!isPicture) {
+		// TODO generic icons
+		return false;
+	}
+	return (
+		<div style={{ width: 150, marginRight: 10, flexShrink: 0 }}>
+			<img style={{ width: '100%', height: '100%' }} src={url}/>
+		</div>
+	);
+};
+
+const FileDom = ({ url, filename }) => {
+	return (
+		<div style={{ display: 'flex' }}>
+			<FileThumb {...{ url }}/>
+			<div style={{
+				display: 'flex',
+				flexDirection: 'column',
+				justifyContent: 'flex-end',
+				alignItems: 'flex-start',
+				minHeight: 100,
+				width: '100%',
+			}}>
+				<FileChangeMessage>
+					{url ? (
+						<a href={url}>{filename}</a>
+					) : (
+						filename
+					)}
+				</FileChangeMessage>
+				{url && (
+					<span style={{ fontSize: 10 }}>
+						url: {url}
+					</span>
+				)}
+			</div>
+		</div>
+	);
+};
+
 let uploadInc = 1000;
 
 const buildInitialState = (props) => ({
@@ -54,8 +96,10 @@ module.exports = Field.create({
 		return this.props.collapse && !this.hasExisting();
 	},
 	componentWillUpdate (nextProps) {
+		const value = this.props.value || {};
+		const nextVal = nextProps.value || {};
 		// Show the new filename when it's finished uploading
-		if (this.props.value.filename !== nextProps.value.filename) {
+		if (value.filename !== nextVal.filename) {
 			this.setState(buildInitialState(nextProps));
 		}
 	},
@@ -71,9 +115,11 @@ module.exports = Field.create({
 		return this.props.value && !!this.props.value.filename;
 	},
 	getFilename () {
-		return this.state.userSelectedFile
-			? this.state.userSelectedFile.name
-			: this.props.value.filename;
+		const { value } = this.props;
+		const { userSelectedFile } = this.state;
+		return userSelectedFile
+			? userSelectedFile.name
+			: value && (value.originalname || value.filename);
 	},
 	getFileUrl () {
 		return this.props.value && this.props.value.url;
@@ -88,7 +134,7 @@ module.exports = Field.create({
 	// ==============================
 
 	triggerFileBrowser () {
-		this.refs.fileInput.clickDomNode();
+		this.fileInput && this.fileInput.clickDomNode();
 	},
 	handleFileChange (event) {
 		const userSelectedFile = event.target.files[0];
@@ -131,14 +177,16 @@ module.exports = Field.create({
 	// ==============================
 
 	renderFileNameAndChangeMessage () {
-		const href = this.props.value ? this.props.value.url : undefined;
+		const { value } = this.props;
+		let url;
+		let filename;
+		if (this.hasFile() && !this.state.removeExisting) {
+			url = value && value.url;
+			filename = this.getFilename();
+		}
 		return (
 			<div>
-				{(this.hasFile() && !this.state.removeExisting) ? (
-					<FileChangeMessage component={href ? 'a' : 'span'} href={href} target="_blank">
-						{this.getFilename()}
-					</FileChangeMessage>
-				) : null}
+				{filename && <FileDom {...{ url, filename }}/>}
 				{this.renderChangeMessage()}
 			</div>
 		);
@@ -242,7 +290,7 @@ module.exports = Field.create({
 								key={this.state.uploadFieldPath}
 								name={this.state.uploadFieldPath}
 								onChange={this.handleFileChange}
-								ref="fileInput"
+								ref={el => { this.fileInput = el; }}
 							/>
 							{this.renderActionInput()}
 						</div>
